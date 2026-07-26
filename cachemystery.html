@@ -226,13 +226,15 @@
 
             <button onclick="validerReponse()">Valider la réponse</button>
         </div>
-
-        <div id="screen-victoire" class="hidden">
+<div id="screen-victoire" class="hidden">
             <h1>Mission Accomplie !</h1>
-            <p>Félicitations <span id="player-name-win"></span> ! Tu as traversé le portail temporel et résolu l'énigme de Bassecourt avec succès.</p>
-            <p style="color: #00ff80; font-weight: bold; margin-top: 15px;">Le protocole est terminé. Tu peux valider ta découverte sur le terrain !</p>
+            <p>Félicitations <span id="player-name-win"></span> ! Tu as traversé le portail temporel et résolu l'énigme de Bassecourt.</p>
+            
+            <div class="gps-box">
+                <div class="gps-coords">47°XX'XXX"N 7°XX'XXX"E</div>
+                <a href="https://maps.google.com/?q=47.XXXX,7.XXXX" target="_blank" class="map-btn">Ouvrir le final dans Google Maps</a>
+            </div>
         </div>
-    </div>
 
     <audio id="audio-rap" src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" loop></audio>
     <audio id="audio-mj" src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3" loop></audio>
