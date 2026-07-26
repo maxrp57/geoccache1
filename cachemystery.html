@@ -1,0 +1,1475 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cache Mystère - Chrono-Exploration</title>
+    <style>
+        :root {
+            --bg-primary: #030712;
+            --panel-bg: rgba(11, 19, 38, 0.88);
+            --neon-blue: #00d2ff;
+            --neon-gold: #ffb703;
+            --neon-green: #10b981;
+            --neon-red: #ef4444;
+            --neon-magenta: #ec4899;
+            --text-main: #f3f4f6;
+            --text-muted: #9ca3af;
+            --border-glow: rgba(0, 210, 255, 0.35);
+        }
+
+        body {
+            font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: var(--bg-primary);
+            background-image: 
+                radial-gradient(circle at 10% 20%, rgba(0, 210, 255, 0.08) 0%, transparent 40%),
+                radial-gradient(circle at 90% 80%, rgba(255, 183, 3, 0.06) 0%, transparent 40%);
+            color: var(--text-main);
+            margin: 0;
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            box-sizing: border-box;
+            overflow-x: hidden;
+        }
+
+        .container {
+            background: var(--panel-bg);
+            padding: 30px;
+            border-radius: 24px;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6), 0 0 30px rgba(0, 210, 255, 0.1);
+            max-width: 480px;
+            width: 100%;
+            text-align: center;
+            box-sizing: border-box;
+            display: none;
+            animation: slideInUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid var(--border-glow);
+            position: relative;
+        }
+
+        #accueil {
+            display: block;
+        }
+
+        @keyframes slideInUp {
+            from { opacity: 0; transform: translateY(25px) scale(0.97); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            20%, 60% { transform: translateX(-8px); }
+            40%, 80% { transform: translateX(8px); }
+        }
+
+        .shake-effect {
+            animation: shake 0.3s ease-in-out;
+            border-color: var(--neon-red) !important;
+            box-shadow: 0 0 25px rgba(239, 68, 68, 0.5) !important;
+        }
+
+        h2 {
+            color: var(--neon-blue);
+            margin-top: 0;
+            font-size: 24px;
+            font-weight: 800;
+            letter-spacing: 0.5px;
+            text-shadow: 0 0 12px rgba(0, 210, 255, 0.4);
+            text-transform: uppercase;
+        }
+
+        p {
+            color: var(--text-muted);
+            font-size: 15px;
+            line-height: 1.6;
+        }
+
+        input[type="text"] {
+            background: rgba(3, 7, 18, 0.7);
+            border: 2px solid rgba(0, 210, 255, 0.3);
+            color: var(--neon-blue);
+            border-radius: 14px;
+            padding: 16px;
+            font-size: 16px;
+            width: 100%;
+            box-sizing: border-box;
+            transition: all 0.3s ease;
+            text-align: center;
+            font-weight: 600;
+        }
+
+        input[type="text"]::placeholder {
+            color: rgba(156, 163, 175, 0.5);
+            font-weight: normal;
+        }
+
+        input[type="text"]:focus {
+            outline: none;
+            border-color: var(--neon-blue);
+            box-shadow: 0 0 20px rgba(0, 210, 255, 0.4);
+            background: rgba(3, 7, 18, 0.9);
+        }
+
+        button {
+            background: linear-gradient(135deg, #0099ff 0%, #0044cc 100%);
+            color: #ffffff;
+            border: none;
+            padding: 16px 24px;
+            border-radius: 14px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 15px;
+            width: 100%;
+            box-shadow: 0 8px 25px rgba(0, 153, 255, 0.3);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 30px rgba(0, 153, 255, 0.5);
+            filter: brightness(1.1);
+        }
+
+        button:active {
+            transform: translateY(1px);
+        }
+
+        /* --- SÉLECTEUR DE MUSIQUE --- */
+        .music-selector-container {
+            display: flex;
+            gap: 12px;
+            margin: 20px 0;
+        }
+
+        .music-card {
+            flex: 1;
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: 14px;
+            padding: 14px 10px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: rgba(255, 255, 255, 0.03);
+            font-weight: bold;
+            font-size: 14px;
+            color: var(--text-muted);
+        }
+
+        .music-card:hover {
+            border-color: rgba(0, 210, 255, 0.4);
+            background: rgba(255, 255, 255, 0.06);
+        }
+
+        .music-card input[type="radio"] {
+            display: none;
+        }
+
+        .music-card.selected {
+            border-color: var(--neon-green);
+            background: rgba(16, 185, 129, 0.12);
+            color: var(--neon-green);
+            box-shadow: 0 0 15px rgba(16, 185, 129, 0.25);
+        }
+
+        /* --- HUD DE JEU & COORDONNÉES --- */
+        .game-hud {
+            display: flex;
+            justify-content: space-between;
+            background: rgba(0, 0, 0, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            padding: 10px 14px;
+            border-radius: 10px;
+            margin-bottom: 18px;
+            font-size: 13px;
+            font-weight: bold;
+        }
+
+        .hud-timer {
+            color: var(--neon-gold);
+            font-size: 16px;
+            text-shadow: 0 0 8px rgba(255, 183, 3, 0.5);
+        }
+
+        .gps-coords {
+            background: rgba(0, 210, 255, 0.06);
+            border: 2px solid rgba(0, 210, 255, 0.3);
+            padding: 14px;
+            border-radius: 12px;
+            font-family: monospace;
+            font-size: 15px;
+            color: var(--neon-blue);
+            margin: 15px 0;
+            font-weight: bold;
+            letter-spacing: 1px;
+        }
+
+        /* --- PORTAIL TEMPOREL (ACCUEIL) --- */
+        .portal-wrapper {
+            position: relative;
+            width: 160px;
+            height: 160px;
+            margin: 25px auto;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .portal-ring-1 {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            border: 3px dashed transparent;
+            border-top-color: var(--neon-blue);
+            border-bottom-color: var(--neon-gold);
+            animation: portalSpin 2s linear infinite;
+            position: absolute;
+        }
+
+        .portal-ring-2 {
+            width: 115px;
+            height: 115px;
+            border-radius: 50%;
+            border: 3px solid transparent;
+            border-left-color: var(--neon-blue);
+            border-right-color: #ffffff;
+            animation: portalSpinReverse 1.5s linear infinite;
+            position: absolute;
+        }
+
+        .portal-core {
+            width: 75px;
+            height: 75px;
+            background: radial-gradient(circle, var(--neon-blue) 0%, #004488 60%, #000 100%);
+            border-radius: 50%;
+            box-shadow: 0 0 30px var(--neon-blue), inset 0 0 15px #ffffff;
+            animation: portalPulse 1.2s ease-in-out infinite alternate;
+        }
+
+        @keyframes portalSpin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        @keyframes portalSpinReverse { 0% { transform: rotate(360deg); } 100% { transform: rotate(0deg); } }
+        @keyframes portalPulse { 0% { transform: scale(0.85); opacity: 0.7; } 100% { transform: scale(1.1); opacity: 1; } }
+
+        /* --- HYPER-ANIMATION DU PORTAIL --- */
+        #portal-animation-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100vw; height: 100vh;
+            background: #000000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 999;
+            overflow: hidden;
+            will-change: transform, opacity;
+            animation: screenShakeSmooth 2.5s cubic-bezier(0.36, 0, 0.66, 1) forwards;
+        }
+
+        @keyframes screenShakeSmooth {
+            0% { transform: translate3d(0, 0, 0); }
+            15% { transform: translate3d(-5px, 4px, 0); }
+            30% { transform: translate3d(6px, -4px, 0); }
+            45% { transform: translate3d(-6px, -3px, 0); }
+            60% { transform: translate3d(4px, 5px, 0); }
+            75% { transform: translate3d(-3px, -3px, 0); }
+            90% { transform: translate3d(2px, -1px, 0); }
+            100% { transform: translate3d(0, 0, 0); }
+        }
+
+        .hyper-vortex-bg {
+            position: absolute;
+            width: 200vw; height: 200vw;
+            background: radial-gradient(circle, rgba(0,210,255,0.35) 0%, rgba(236,72,153,0.25) 40%, rgba(11,19,38,0.95) 70%, #000 100%);
+            will-change: transform;
+            animation: bgVortexSpin 2.5s cubic-bezier(0.25, 1, 0.5, 1) infinite;
+        }
+
+        @keyframes bgVortexSpin {
+            0% { transform: rotate(0deg) scale(1); }
+            50% { transform: rotate(180deg) scale(1.15); }
+            100% { transform: rotate(360deg) scale(1); }
+        }
+
+        .quantum-ring {
+            position: absolute;
+            border-radius: 50%;
+            border: 4px solid transparent;
+            will-change: transform, opacity;
+            animation: quantumExpand 2.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        .quantum-ring:nth-child(1) { border-color: var(--neon-blue); box-shadow: 0 0 35px var(--neon-blue), inset 0 0 35px var(--neon-blue); animation-delay: 0s; }
+        .quantum-ring:nth-child(2) { border-color: var(--neon-magenta); box-shadow: 0 0 45px var(--neon-magenta), inset 0 0 45px var(--neon-magenta); animation-delay: 0.25s; }
+        .quantum-ring:nth-child(3) { border-color: var(--neon-gold); box-shadow: 0 0 55px var(--neon-gold), inset 0 0 55px var(--neon-gold); animation-delay: 0.5s; }
+        .quantum-ring:nth-child(4) { border-color: #ffffff; box-shadow: 0 0 75px #ffffff, inset 0 0 75px #ffffff; animation-delay: 0.75s; }
+
+        @keyframes quantumExpand {
+            0% { width: 40px; height: 40px; transform: rotate(0deg) scale(1); opacity: 0; }
+            25% { opacity: 1; }
+            100% { width: 190vw; height: 190vw; transform: rotate(540deg) scale(1.05); opacity: 0; }
+        }
+
+        .super-core {
+            position: absolute;
+            width: 100px; height: 100px;
+            background: radial-gradient(circle, #ffffff 0%, var(--neon-blue) 40%, #8800ff 70%, transparent 100%);
+            border-radius: 50%;
+            will-change: transform, opacity, filter;
+            box-shadow: 0 0 100px 50px var(--neon-blue), 0 0 200px 100px var(--neon-magenta), 0 0 300px 150px var(--neon-gold);
+            animation: coreMegaBurst 2.4s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+        }
+
+        @keyframes coreMegaBurst {
+            0% { transform: scale(0.1); opacity: 0; }
+            35% { transform: scale(3.2); opacity: 1; filter: brightness(1.4); }
+            75% { transform: scale(14); opacity: 1; }
+            100% { transform: scale(45); opacity: 1; background: #ffffff; box-shadow: 0 0 500px 300px #ffffff; }
+        }
+
+        .portal-msg {
+            position: absolute;
+            color: #ffffff;
+            font-size: 22px;
+            font-weight: 900;
+            letter-spacing: 2px;
+            text-shadow: 0 0 20px var(--neon-blue), 0 0 40px var(--neon-magenta);
+            animation: textPulseGlow 0.4s ease-in-out infinite alternate;
+            z-index: 1000;
+            text-align: center;
+            width: 100%;
+            will-change: transform, opacity;
+        }
+
+        @keyframes textPulseGlow {
+            from { opacity: 0.7; transform: scale(1); text-shadow: 0 0 12px var(--neon-blue); }
+            to { opacity: 1; transform: scale(1.1); text-shadow: 0 0 35px var(--neon-magenta), 0 0 55px var(--neon-blue); }
+        }
+
+        /* --- PAYSAGE DE GUERRE & MINI-JEUX --- */
+        .war-visual-box {
+            background: radial-gradient(circle, rgba(60,20,20,0.85) 0%, rgba(20,10,10,0.95) 100%);
+            border: 2px solid rgba(239, 68, 68, 0.5);
+            border-radius: 14px;
+            padding: 20px;
+            margin: 20px 0;
+            position: relative;
+            box-shadow: inset 0 0 25px rgba(239, 68, 68, 0.25);
+        }
+
+        .progress-bar-container {
+            background: rgba(0, 0, 0, 0.5);
+            border: 2px solid rgba(239, 68, 68, 0.4);
+            border-radius: 12px;
+            height: 24px;
+            width: 100%;
+            margin: 15px 0;
+            overflow: hidden;
+            box-sizing: border-box;
+        }
+
+        .progress-fill {
+            background: linear-gradient(90deg, var(--neon-red), var(--neon-gold));
+            height: 100%;
+            width: 0%;
+            transition: width 0.15s ease;
+        }
+
+        /* --- MINI-JEU MISSILES & TOUR --- */
+        .tower-battle-area {
+            position: relative;
+            height: 160px;
+            margin: 20px 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            background: rgba(0, 0, 0, 0.4);
+            border-radius: 14px;
+            border: 1px solid rgba(239, 68, 68, 0.3);
+        }
+
+        #enemy-tower {
+            font-size: 70px;
+            transition: transform 0.2s ease, filter 0.2s ease;
+        }
+
+        #flying-missile {
+            position: absolute;
+            bottom: 10px;
+            font-size: 28px;
+            display: none;
+            will-change: transform;
+            transition: transform 0.45s cubic-bezier(0.1, 1, 0.3, 1);
+        }
+
+        /* --- MINI-JEU CÂBLES : INTÉRIEUR ORDINATEUR --- */
+        .computer-interior {
+            background: rgba(3, 7, 18, 0.95);
+            border: 2px solid rgba(0, 210, 255, 0.4);
+            border-radius: 16px;
+            padding: 20px;
+            margin: 20px 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: inset 0 0 25px rgba(0, 210, 255, 0.15);
+            position: relative;
+        }
+
+        .ports-column {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            width: 46%;
+        }
+
+        .cable-node {
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            padding: 12px 10px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: bold;
+            transition: all 0.2s ease;
+            text-align: center;
+            color: var(--text-main);
+        }
+
+        .cable-node:hover {
+            border-color: var(--neon-blue);
+            background: rgba(0, 210, 255, 0.1);
+        }
+
+        .cable-node.selected {
+            border-color: var(--neon-gold) !important;
+            background: rgba(255, 183, 3, 0.2) !important;
+            box-shadow: 0 0 15px rgba(255, 183, 3, 0.5);
+            color: var(--neon-gold);
+        }
+
+        .cable-node.connected {
+            border-color: var(--neon-green) !important;
+            background: rgba(16, 185, 129, 0.2) !important;
+            color: var(--neon-green);
+            box-shadow: 0 0 12px rgba(16, 185, 129, 0.3);
+            cursor: default;
+        }
+
+        /* --- STYLES POUR LA FOUILLE DE FICHIERS --- */
+        .file-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin: 15px 0;
+        }
+
+        .file-item {
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(0, 210, 255, 0.2);
+            padding: 12px 16px;
+            border-radius: 12px;
+            text-align: left;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .file-item:hover {
+            border-color: var(--neon-blue);
+            background: rgba(0, 210, 255, 0.08);
+            transform: translateX(3px);
+        }
+
+        /* --- CANVAS MINI-JEU RPG INFILTRATION COMPLEXE --- */
+        .rpg-arena-wrapper {
+            position: relative;
+            margin: 15px 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        #rpg-canvas {
+            background: #060a17;
+            border: 2px solid var(--neon-gold);
+            border-radius: 16px;
+            box-shadow: inset 0 0 25px rgba(255, 183, 3, 0.2), 0 0 15px rgba(255, 183, 3, 0.3);
+            display: block;
+            touch-action: none;
+        }
+
+        .rpg-quest-hud {
+            display: flex;
+            justify-content: space-around;
+            background: rgba(0,0,0,0.6);
+            border: 1px solid rgba(255, 183, 3, 0.3);
+            padding: 8px;
+            border-radius: 10px;
+            margin-bottom: 12px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .quest-item {
+            color: var(--text-muted);
+            transition: color 0.3s ease;
+        }
+
+        .quest-item.completed {
+            color: var(--neon-green);
+            text-shadow: 0 0 8px rgba(16, 185, 129, 0.4);
+        }
+
+        .d-pad {
+            display: grid;
+            grid-template-columns: repeat(3, 50px);
+            grid-template-rows: repeat(2, 50px);
+            gap: 8px;
+            margin-top: 12px;
+            justify-content: center;
+        }
+
+        .d-btn {
+            background: rgba(255, 183, 3, 0.15);
+            border: 2px solid var(--neon-gold);
+            color: var(--neon-gold);
+            font-size: 18px;
+            font-weight: bold;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            user-select: none;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+            transition: all 0.1s ease;
+            margin: 0;
+            width: auto;
+            padding: 0;
+        }
+
+        .d-btn:hover, .d-btn:active {
+            background: rgba(255, 183, 3, 0.35);
+            transform: scale(0.95);
+        }
+
+        /* --- ANIMATION DE CONFRONTATION & MANGEAGE DE BURGER --- */
+        .confrontation-box {
+            position: relative;
+            height: 180px;
+            background: radial-gradient(circle, rgba(20,10,30,0.9) 0%, rgba(2,4,10,0.95) 100%);
+            border: 2px solid var(--neon-magenta);
+            border-radius: 16px;
+            margin: 20px 0;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            overflow: hidden;
+            box-shadow: inset 0 0 30px rgba(236, 72, 153, 0.2);
+        }
+
+        .char-avatar {
+            font-size: 55px;
+            transition: transform 0.3s ease;
+        }
+
+        #moving-burger {
+            position: absolute;
+            font-size: 36px;
+            left: 20%;
+            display: none;
+            z-index: 10;
+        }
+
+        @keyframes burgerGlideToEnemy {
+            0% { left: 18%; transform: scale(1) rotate(0deg); }
+            50% { transform: scale(1.4) rotate(15deg); filter: drop-shadow(0 0 15px var(--neon-gold)); }
+            100% { left: 72%; transform: scale(1.1) rotate(360deg); }
+        }
+
+        .glide-anim {
+            display: block !important;
+            animation: burgerGlideToEnemy 1.2s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+        }
+
+        @keyframes enemyHappyEat {
+            0% { transform: scale(1); }
+            30% { transform: scale(1.25) translateY(-8px); filter: drop-shadow(0 0 25px var(--neon-green)); }
+            60% { transform: scale(1.1) translateY(4px); }
+            100% { transform: scale(1) translateY(0); }
+        }
+
+        .eat-anim {
+            animation: enemyHappyEat 1.2s ease-in-out forwards;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container" id="accueil">
+        <h2>🧭 Chrono-Cache</h2>
+        <p>Entrez votre pseudo de géocacheur et sélectionnez votre bande-son pour lancer l'expédition :</p>
+        
+        <input type="text" id="pseudo" placeholder="Votre Pseudo" required>
+        
+        <div class="music-selector-container">
+            <label class="music-card selected" id="card-rap" onclick="choisirMusique('rap')">
+                <input type="radio" name="musique" value="rap" checked>
+                🎧 Rap
+            </label>
+            <label class="music-card" id="card-michael" onclick="choisirMusique('michael')">
+                <input type="radio" name="musique" value="michael">
+                🕺 Michael Jackson
+            </label>
+        </div>
+
+        <button onclick="commencerAventure()">Lancer l'Aventure</button>
+        <div id="erreur-accueil" style="color: var(--neon-red); margin-top: 12px; display: none; font-weight: bold; font-size: 14px;">Veuillez entrer un pseudo valide.</div>
+    </div>
+
+    <div class="container" id="portal-container">
+        <h2>🌀 Synchro Temporelle</h2>
+        <p id="portal-text">Établissement de la liaison dimensionnelle...</p>
+        <div class="portal-wrapper">
+            <div class="portal-ring-1"></div>
+            <div class="portal-ring-2"></div>
+            <div class="portal-core"></div>
+        </div>
+        <p style="font-size: 13px; color: var(--neon-blue);">Initialisation pour <span id="portal-pseudo"></span>...</p>
+    </div>
+
+    <div class="container" id="intro-container" style="text-align: left;">
+        <h2 style="text-align: center;">⏳ Mission Active</h2>
+        <p>Bienvenue dans cette géocache Mystère interactive ! ⏳🧭</p>
+        <p>Félicitations, <span id="intro-pseudo" style="color: #ffffff; font-weight: bold; text-shadow: 0 0 8px var(--neon-blue);"></span> ! La machine temporelle est active.</p>
+        <button onclick="lancerPhaseDepart()" style="margin-top: 20px;">Commencer l'exploration</button>
+    </div>
+
+    <div class="container" id="etape-depart">
+        <div class="game-hud">
+            <div>PHASE 1</div>
+            <div style="color: var(--neon-blue);">POINT INITIAL</div>
+        </div>
+        <h2>📍 Rendez-vous au départ</h2>
+        <p>Rends-toi immédiatement aux coordonnées GPS initiales :</p>
+        
+        <div class="gps-coords">47°20'13.0"N 7°14'39.2"E</div>
+        
+        <a href="https://maps.google.com/?q=47.336944,7.244222" target="_blank" style="text-decoration: none;">
+            <button style="background: rgba(0, 210, 255, 0.15); border: 1px solid var(--neon-blue); margin-bottom: 5px;">🗺️ Ouvrir dans Google Maps</button>
+        </a>
+
+        <button onclick="lancerSprint()" style="background: linear-gradient(135deg, var(--neon-green) 0%, #065f46 100%); color: #ffffff;">✅ Je suis sur place, lancer le sprint !</button>
+    </div>
+
+    <div class="container" id="etape-sprint">
+        <div class="game-hud">
+            <div>SPRINT VERS LE PORTAIL</div>
+            <div class="hud-timer" id="timer-box">03:00</div>
+        </div>
+        <h2>⚡ Alerte Chrono !</h2>
+        <p>Le portail temporel est ouvert à l'emplacement exact indiqué ci-dessous. Cours vite vers le portail et clique sur le bouton avant la fin des **3 minutes** !</p>
+        
+        <div class="gps-coords">47°20'18.8"N 7°14'44.3"E</div>
+
+        <a href="https://maps.google.com/?q=47.338556,7.245639" target="_blank" style="text-decoration: none;">
+            <button style="background: rgba(0, 210, 255, 0.15); border: 1px solid var(--neon-blue); margin-bottom: 10px;">🗺️ Voir l'emplacement du portail</button>
+        </a>
+
+        <div style="font-size: 35px; margin: 5px 0;">🏃‍♂️💨</div>
+
+        <button onclick="atteindrePortail()" style="background: linear-gradient(135deg, var(--neon-gold) 0%, #b45309 100%); color: #ffffff; font-size: 16px;">🚀 J'AI ATTEINT LE PORTAIL !</button>
+    </div>
+
+    <div class="container" id="etape-enigme">
+        <div class="game-hud">
+            <div>PHASE FINALE</div>
+            <div style="color: var(--neon-blue);">ANALYSE DU PONT</div>
+        </div>
+        <h2>🌉 Saisie de Sécurité</h2>
+        <p>Tu es arrivé à destination à temps ! Dernière étape avant le saut :</p>
+        <p style="color: #ffffff; font-weight: bold; font-size: 15px;">Quelle tonnes maximal peut supporter le pont ?</p>
+        
+        <input type="text" id="reponse-pont" placeholder="Réponse">
+        <button onclick="validerReponsePont()">Valider la Réponse</button>
+        <div id="erreur-pont" style="color: var(--neon-red); margin-top: 10px; font-weight: bold; display: none; font-size: 14px;">❌ Mauvaise réponse ! Réessaie.</div>
+    </div>
+
+    <div class="container" id="etape-guerre" style="border-color: var(--neon-red); box-shadow: 0 0 40px rgba(239, 68, 68, 0.25);">
+        <h2 style="color: var(--neon-red);">🪖 Front de l'Empire Allemand</h2>
+        <p>Tu sors du portail en plein cœur d'un <strong style="color: #ffffff;">paysage de guerre historique</strong>. Une gigantesque tour ennemie domine la zone !</p>
+        
+        <div class="war-visual-box">
+            <div style="font-size: 40px; margin: 10px 0;">🗼🔥💣</div>
+            <p style="font-size: 13px; color: var(--text-muted); font-style: italic; margin: 0;">"Utilise l'artillerie lourde pour détruire la tour de commandement et briser la résistance ennemie !"</p>
+        </div>
+
+        <button onclick="lancerMiniJeuMissiles()" style="background: linear-gradient(135deg, var(--neon-red) 0%, #991b1b 100%); color: #ffffff;">🚀 Passer aux tirs de missiles !</button>
+    </div>
+
+    <div class="container" id="etape-minijeu-missiles" style="border-color: var(--neon-red);">
+        <div class="game-hud">
+            <div>CAMPAGNE MILITAIRE</div>
+            <div style="color: var(--neon-red);">ARTILLERIE LOURDE</div>
+        </div>
+        <h2>🎯 Destruction de la Tour</h2>
+        <p>Appuie sur le bouton pour lancer un missile et viser la tour ennemie (5 impacts requis) !</p>
+        
+        <div class="tower-battle-area" id="tower-battle-box">
+            <div id="enemy-tower">🗼</div>
+            <div id="flying-missile">🚀</div>
+        </div>
+
+        <div style="font-weight: bold; margin-bottom: 8px; color: var(--neon-red);">Intégrité de la Tour : <span id="tower-hp">5</span>/5</div>
+        <div class="progress-bar-container">
+            <div class="progress-fill" id="tower-progress" style="width: 100%; background: linear-gradient(90deg, #ef4444, #f59e0b);"></div>
+        </div>
+
+        <button id="btn-tirer" onclick="tirerMissile()" style="background: linear-gradient(135deg, var(--neon-red) 0%, #b91c1c 100%); color: #ffffff; font-size: 18px; padding: 18px;">💥 TIRER UN MISSILE !</button>
+    </div>
+
+    <div class="container" id="etape-minijeu-2" style="border-color: var(--neon-gold);">
+        <div class="game-hud">
+            <div>CAMPAGNE MILITAIRE</div>
+            <div style="color: var(--neon-gold);">CAPITULATION</div>
+        </div>
+        <h2>🔐 Question Historique Finale</h2>
+        <p>La tour est en ruines ! Le QG ennemi capitule mais te pose une ultime colle :</p>
+        <p style="color: #ffffff; font-weight: bold;">Est-ce que la Suisse a été attaquée par les Allemands ?</p>
+        
+        <input type="text" id="reponse-qg" placeholder="Réponds par oui ou non">
+        <button onclick="validerQG()" style="background: linear-gradient(135deg, var(--neon-gold) 0%, #b45309 100%); color: #ffffff;">🔓 Valider la Réponse</button>
+        <div id="erreur-qg" style="color: var(--neon-red); margin-top: 10px; font-weight: bold; display: none; font-size: 14px;">❌ Mauvaise réponse ! L'ennemi riposte.</div>
+    </div>
+
+    <div class="container" id="etape-minijeu-cables" style="border-color: var(--neon-blue);">
+        <div class="game-hud">
+            <div>MAINFRAME CENTRAL</div>
+            <div style="color: var(--neon-blue);">INTÉRIEUR DE L'ORDINATEUR</div>
+        </div>
+        <h2>💻 Raccordement des Circuits</h2>
+        <p>QG neutralisé ! Examine l'intérieur de l'ordinateur et relie chaque borne de commande au bon composant :</p>
+        
+        <div class="computer-interior">
+            <div class="ports-column">
+                <p style="font-size:11px; color:var(--text-muted); margin:0 0 5px 0;">🔴 COMMANDES</p>
+                <div class="cable-node source-node" onclick="selectionnerSource('transmetteur', this)">📡 Transmetteur</div>
+                <div class="cable-node source-node" onclick="selectionnerSource('chiffrement', this)">🔐 Chiffrement</div>
+                <div class="cable-node source-node" onclick="selectionnerSource('alimentation', this)">⚡ Alimentation</div>
+            </div>
+            
+            <div style="font-size: 22px; color: var(--neon-blue);">⚡</div>
+
+            <div class="ports-column">
+                <p style="font-size:11px; color:var(--text-muted); margin:0 0 5px 0;">🔌 DESTINATIONS</p>
+                <div class="cable-node target-node" onclick="selectionnerCible('chiffrement', this)">💾 Unité Enigma</div>
+                <div class="cable-node target-node" onclick="selectionnerCible('alimentation', this)">🎛️ Noyau Central</div>
+                <div class="cable-node target-node" onclick="selectionnerCible('transmetteur', this)">🖥️ Processeur QG</div>
+            </div>
+        </div>
+
+        <div id="cable-status-log" style="color: var(--neon-gold); font-size: 13px; font-weight: bold;">Branchements réussis : 0 / 3</div>
+        <div id="erreur-cables" style="color: var(--neon-red); margin-top: 10px; font-weight: bold; display: none; font-size: 14px;">❌ Mauvaise connexion ! Les circuits grillent, réessaie.</div>
+    </div>
+
+    <div class="container" id="etape-mdp-hitler" style="border-color: var(--neon-blue);">
+        <div class="game-hud">
+            <div>TERMINAL DE SÉCURITÉ</div>
+            <div style="color: var(--neon-blue);">AUTHENTIFICATION REQUISE</div>
+        </div>
+        <h2>🔐 Mot de passe Admin</h2>
+        <p>Le câblage est réparé, mais l'écran du mainframe demande un mot de passe administrateur !</p>
+        
+        <div style="background: rgba(0,0,0,0.5); border: 1px solid var(--neon-blue); border-radius: 10px; padding: 14px; margin: 15px 0; font-size: 14px; text-align: left;">
+            <strong style="color: var(--neon-gold);">💡 Indice :</strong> L'année de la fin de la Seconde Guerre mondiale (4 chiffres).
+        </div>
+
+        <input type="text" id="reponse-mdp" placeholder="Entrez le mot de passe">
+        <button onclick="validerMotDePasse()" style="background: linear-gradient(135deg, var(--neon-blue) 0%, #0044cc 100%); color: #ffffff;">🔓 Déverrouiller le Système</button>
+        <div id="erreur-mdp" style="color: var(--neon-red); margin-top: 10px; font-weight: bold; display: none; font-size: 14px;">❌ Mauvais mot de passe ! Accès refusé.</div>
+    </div>
+
+    <div class="container" id="etape-fouille-fichiers" style="border-color: var(--neon-magenta);">
+        <div class="game-hud">
+            <div>ARCHIVES DU QG</div>
+            <div style="color: var(--neon-magenta);">FOUILLE DES DOSSIERS</div>
+        </div>
+        <h2>📂 Investigation des Fichiers</h2>
+        <p>Le terminal est ouvert ! Fouille les fichiers classés secret-défense pour découvrir les secrets et le point faible de l'ennemi :</p>
+        
+        <div class="file-list">
+            <div class="file-item" onclick="verifierFichier('rapport_attaques.txt', this)">
+                <span>📄 rapport_attaques.txt</span>
+                <span style="font-size: 12px; color: var(--text-muted);">[Examiner]</span>
+            </div>
+            <div class="file-item" onclick="verifierFichier('plans_secrets.dat', this)">
+                <span>📁 plans_secrets.dat</span>
+                <span style="font-size: 12px; color: var(--text-muted);">[Examiner]</span>
+            </div>
+            <div class="file-item" onclick="verifierFichier('dossier_personnel_secret.cfg', this)">
+                <span>📑 dossier_personnel_secret.cfg</span>
+                <span style="font-size: 12px; color: var(--text-muted);">[Examiner]</span>
+            </div>
+            <div class="file-item" onclick="verifierFichier('journal_commandement.log', this)">
+                <span>📜 journal_commandement.log</span>
+                <span style="font-size: 12px; color: var(--text-muted);">[Examiner]</span>
+            </div>
+        </div>
+
+        <div id="file-message-box" style="background: rgba(0,0,0,0.6); border: 1px dashed var(--neon-magenta); border-radius: 12px; padding: 14px; margin-top: 15px; font-size: 14px; color: var(--neon-gold); min-height: 40px; display: flex; align-items: center; justify-content: center;">
+            Clique sur un fichier pour analyser son contenu...
+        </div>
+
+        <button id="btn-suite-burger" onclick="lancerJeuPoursuite()" style="background: linear-gradient(135deg, var(--neon-magenta) 0%, #9333ea 100%); color: #ffffff; margin-top: 15px; display: none;">🍔 Lancer l'infiltration de la base secrète !</button>
+    </div>
+
+    <div class="container" id="etape-vol-burger" style="border-color: var(--neon-gold);">
+        <div class="game-hud">
+            <div>MINI-JEU RPG AVANCÉ</div>
+            <div style="color: var(--neon-gold);">INFILTRATION DE LA BASE</div>
+        </div>
+        <h2>👑 Mission Infiltration & Burger</h2>
+        
+        <div class="rpg-quest-hud">
+            <div class="quest-item" id="quest-key">🔑 Clé: 0/1</div>
+            <div class="quest-item" id="quest-terminal">💻 Terminal: 0/1</div>
+            <div class="quest-item" id="quest-burger">🍔 Burger: Verrouillé</div>
+        </div>
+
+        <div class="rpg-arena-wrapper">
+            <canvas id="rpg-canvas" width="360" height="260"></canvas>
+            
+            <div class="d-pad">
+                <div></div>
+                <div class="d-btn" onmousedown="pressKey('ArrowUp')" ontouchstart="pressKey('ArrowUp')">⬆️</div>
+                <div></div>
+                <div class="d-btn" onmousedown="pressKey('ArrowLeft')" ontouchstart="pressKey('ArrowLeft')">⬅️</div>
+                <div class="d-btn" onmousedown="pressKey('ArrowDown')" ontouchstart="pressKey('ArrowDown')">⬇️</div>
+                <div class="d-btn" onmousedown="pressKey('ArrowRight')" ontouchstart="pressKey('ArrowRight')">➡️</div>
+            </div>
+        </div>
+        <div id="rpg-status" style="font-size: 12px; color: var(--neon-gold); font-weight: bold; margin-top: 8px;">1️⃣ Trouve la clé d'accès (🔑) dans le labyrinthe !</div>
+    </div>
+
+    <div class="container" id="etape-confrontation" style="border-color: var(--neon-green); box-shadow: 0 0 40px rgba(16, 185, 129, 0.25);">
+        <div class="game-hud">
+            <div>DÉNOUEMENT ÉPIQUE</div>
+            <div style="color: var(--neon-green);">LE FESTIN DE LA PAIX</div>
+        </div>
+        <h2>🕊️ Le Traité du Burger</h2>
+        <p>Te voici face au chef suprême de l'Empire ! Présente-lui le Burger King chaud pour le faire fondre et arrêter la guerre :</p>
+        
+        <div class="confrontation-box" id="anim-box">
+            <div class="char-avatar" id="player-char">🥷</div>
+            <div id="moving-burger">🍔</div>
+            <div class="char-avatar" id="enemy-char">💂‍♂️</div>
+        </div>
+
+        <div id="confrontation-text" style="font-weight: bold; font-size: 14px; color: var(--neon-gold); margin-bottom: 12px;">Appuie sur le bouton pour tendre le burger !</div>
+
+        <button id="btn-offrir" onclick="offrirBurger()" style="background: linear-gradient(135deg, var(--neon-green) 0%, #047857 100%); color: #ffffff; font-size: 18px; padding: 18px;">🍔 Offrir le Burger et Arrêter la Guerre</button>
+    </div>
+
+    <div class="container" id="final" style="border-color: var(--neon-gold); box-shadow: 0 0 60px rgba(255, 183, 3, 0.4); max-width: 540px;">
+        <div style="font-size: 50px; margin-bottom: 10px;">🌟🏆🚀</div>
+        <h2 style="color: var(--neon-gold); font-size: 26px; text-shadow: 0 0 20px rgba(255,183,3,0.6);">FÉLICITATIONS ÉPIQUES, <span id="gagnant-pseudo"></span> !</h2>
+        
+        <div style="background: rgba(255, 183, 3, 0.08); border: 2px dashed var(--neon-gold); border-radius: 16px; padding: 20px; margin: 15px 0; text-align: left;">
+            <p style="color: #ffffff; font-size: 14px; line-height: 1.7; margin-top: 0;">
+                <strong style="color: var(--neon-gold);">🌍 L'HISTOIRE A ÉTÉ CHANGÉE POUR TOUJOURS ! 📜</strong><br><br>
+                Grâce à ton courage sans limites, ton infiltration de maître dans le labyrinthe des gardes, tes piratages informatiques fulgurants et ton offrande légendaire du Burger King suprême, tu as accompli l'impensable : <strong>arrêter définitivement la guerre et ramener la paix universelle !</strong><br><br>
+                Tu entres à jamais dans la légende des plus grands héros et explorateurs du temps ! 🥇🎉
+            </p>
+        </div>
+
+        <div class="gps-coords" style="border-color: var(--neon-gold); color: var(--neon-gold); font-size: 15px; padding: 18px; background: rgba(255, 183, 3, 0.12); box-shadow: 0 0 20px rgba(255, 183, 3, 0.25);">
+            🎯 COORDONNÉES FINALES DE LA GÉOCACHE :<br>
+            <span style="font-size: 19px; color: #ffffff; font-family: monospace; font-weight: 800; text-shadow: 0 0 10px rgba(255,183,3,0.8);">N 47° 21.456 | E 007° 25.789</span>
+        </div>
+
+        <a href="http://googleusercontent.com/maps.google.com/2" target="_blank" style="text-decoration: none;">
+            <button style="background: rgba(0, 210, 255, 0.2); border: 1px solid var(--neon-blue); margin-top: 5px; margin-bottom: 5px;">🗺️ Ouvrir les coordonnées finales dans Maps</button>
+        </a>
+
+        <button onclick="location.reload()" style="background: linear-gradient(135deg, var(--neon-gold) 0%, #b45309 100%); color: #ffffff; margin-top: 15px; font-size: 16px;">🔄 Rejouer l'Aventure</button>
+    </div>
+
+    <div id="portal-animation-overlay">
+        <div class="hyper-vortex-bg"></div>
+        <div class="quantum-ring"></div>
+        <div class="quantum-ring"></div>
+        <div class="quantum-ring"></div>
+        <div class="quantum-ring"></div>
+        <div class="super-core"></div>
+        <div class="portal-msg">⚡ ACTIVATION DU SAUT QUANTIQUE... ⚡</div>
+    </div>
+
+    <script>
+        let joueur = {
+            pseudo: "",
+            musique: "rap"
+        };
+
+        let currentAudio = null;
+        let timerInterval = null;
+        let tempsRestant = 180;
+        
+        let towerHP = 5;
+        let isFiring = false;
+
+        let selectedSource = null;
+        let selectedSourceElement = null;
+        let connectionsMade = 0;
+        const totalConnections = 3;
+
+        // --- VARIABLES DU JEU RPG AVANCÉ ---
+        let rpgCanvas, rpgCtx;
+        let gameRunning = false;
+        let playerX = 40, playerY = 220, playerSize = 22, playerSpeed = 3.2;
+        
+        // Murs du labyrinthe de la base
+        let rpgWalls = [
+            {x: 0, y: 0, w: 360, h: 12},
+            {x: 0, y: 248, w: 360, h: 12},
+            {x: 0, y: 0, w: 12, h: 260},
+            {x: 348, y: 0, w: 12, h: 260},
+            // Obstacles intérieurs
+            {x: 70, y: 0, w: 16, h: 100},
+            {x: 70, y: 160, w: 16, h: 90},
+            {x: 160, y: 70, w: 16, h: 130},
+            {x: 250, y: 0, w: 16, h: 100},
+            {x: 250, y: 160, w: 16, h: 90}
+        ];
+
+        // Objectifs de la quête
+        let keyObj = { x: 315, y: 40, collected: false, radius: 12 };
+        let terminalObj = { x: 45, y: 40, hacked: false, radius: 14 };
+        let burgerObj = { x: 180, y: 35, unlocked: false, radius: 15 };
+
+        let rpgGuards = [
+            { x: 120, y: 130, vx: 2.2, minX: 100, maxX: 220, radius: 14 },
+            { x: 280, y: 200, vy: -2.0, minY: 120, maxY: 230, radius: 14, vertical: true },
+            { x: 120, y: 60, vx: -2.5, minX: 90, maxX: 220, radius: 14 }
+        ];
+
+        let keysPressed = {};
+        let rpgAnimFrame = null;
+
+        function choisirMusique(type) {
+            joueur.musique = type;
+            document.getElementById('card-rap').classList.remove('selected');
+            document.getElementById('card-michael').classList.remove('selected');
+            
+            if(type === 'rap') {
+                document.getElementById('card-rap').classList.add('selected');
+                document.querySelector('input[value="rap"]').checked = true;
+            } else {
+                document.getElementById('card-michael').classList.add('selected');
+                document.querySelector('input[value="michael"]').checked = true;
+            }
+        }
+
+        function cacherTousLesEcrans() {
+            document.querySelectorAll('.container').forEach(el => el.style.display = 'none');
+            if(gameRunning) {
+                gameRunning = false;
+                cancelAnimationFrame(rpgAnimFrame);
+            }
+        }
+
+        function commencerAventure() {
+            let pseudoSaisi = document.getElementById("pseudo").value.trim();
+
+            if(pseudoSaisi === "") {
+                document.getElementById("erreur-accueil").style.display = "block";
+                document.getElementById("accueil").classList.add('shake-effect');
+                setTimeout(() => document.getElementById("accueil").classList.remove('shake-effect'), 300);
+                return;
+            }
+
+            joueur.pseudo = pseudoSaisi;
+
+            let fichierAudio = (joueur.musique === "rap") ? "rap.mp3" : "michael.mp3";
+            currentAudio = new Audio(fichierAudio);
+            currentAudio.loop = true;
+            currentAudio.play().catch(error => {
+                console.log("Lecture automatique bloquée par le navigateur :", error);
+            });
+
+            cacherTousLesEcrans();
+            document.getElementById("portal-pseudo").innerText = joueur.pseudo;
+            document.getElementById("portal-container").style.display = "block";
+
+            setTimeout(function() {
+                cacherTousLesEcrans();
+                document.getElementById("intro-pseudo").innerText = joueur.pseudo;
+                document.getElementById("intro-container").style.display = "block";
+            }, 3000);
+        }
+
+        function lancerPhaseDepart() {
+            cacherTousLesEcrans();
+            document.getElementById("etape-depart").style.display = "block";
+        }
+
+        function lancerSprint() {
+            cacherTousLesEcrans();
+            document.getElementById("etape-sprint").style.display = "block";
+            lancerChrono();
+        }
+
+        function lancerChrono() {
+            tempsRestant = 180;
+            mettreAJourAffichageTemps();
+            
+            timerInterval = setInterval(() => {
+                tempsRestant--;
+                mettreAJourAffichageTemps();
+
+                if(tempsRestant <= 0) {
+                    clearInterval(timerInterval);
+                    alert("⏰ Temps écoulé ! Tu n'as pas cliqué à temps. Game Over.");
+                    location.reload();
+                }
+            }, 1000);
+        }
+
+        function mettreAJourAffichageTemps() {
+            let minutes = Math.floor(tempsRestant / 60);
+            let secondes = tempsRestant % 60;
+            let formatMin = minutes < 10 ? "0" + minutes : minutes;
+            let formatSec = secondes < 10 ? "0" + secondes : secondes;
+            document.getElementById('timer-box').innerText = `${formatMin}:${formatSec}`;
+        }
+
+        function atteindrePortail() {
+            clearInterval(timerInterval);
+            cacherTousLesEcrans();
+            document.getElementById('etape-enigme').style.display = 'block';
+        }
+
+        function validerReponsePont() {
+            const reponse = document.getElementById('reponse-pont').value.trim();
+            
+            if(reponse === "28" || reponse.toLowerCase().includes("28")) {
+                const overlay = document.getElementById('portal-animation-overlay');
+                overlay.style.display = 'flex';
+
+                setTimeout(() => {
+                    overlay.style.display = 'none';
+                    cacherTousLesEcrans();
+                    document.getElementById('etape-guerre').style.display = 'block';
+                }, 2400);
+            } else {
+                document.getElementById('erreur-pont').style.display = 'block';
+                const containerEnigme = document.getElementById('etape-enigme');
+                containerEnigme.classList.add('shake-effect');
+                setTimeout(() => containerEnigme.classList.remove('shake-effect'), 300);
+            }
+        }
+
+        function lancerMiniJeuMissiles() {
+            cacherTousLesEcrans();
+            document.getElementById('etape-minijeu-missiles').style.display = 'block';
+            towerHP = 5;
+            document.getElementById('tower-hp').innerText = towerHP;
+            document.getElementById('tower-progress').style.width = '100%';
+            document.getElementById('enemy-tower').innerText = '🗼';
+            document.getElementById('enemy-tower').style.transform = 'scale(1)';
+        }
+
+        function tirerMissile() {
+            if (isFiring || towerHP <= 0) return;
+            isFiring = true;
+
+            const missile = document.getElementById('flying-missile');
+            const tower = document.getElementById('enemy-tower');
+            const battleBox = document.getElementById('tower-battle-box');
+
+            missile.style.display = 'block';
+            missile.style.transform = 'translateY(0px) scale(1)';
+            
+            setTimeout(() => {
+                missile.style.transform = 'translateY(-105px) scale(1.2)';
+            }, 30);
+
+            setTimeout(() => {
+                missile.style.display = 'none';
+                towerHP--;
+                document.getElementById('tower-hp').innerText = towerHP;
+                document.getElementById('tower-progress').style.width = (towerHP * 20) + '%';
+
+                tower.innerText = '💥';
+                battleBox.classList.add('shake-effect');
+
+                setTimeout(() => {
+                    battleBox.classList.remove('shake-effect');
+                    if (towerHP > 0) {
+                        tower.innerText = '🗼';
+                    } else {
+                        tower.innerText = '🏚️';
+                        tower.style.transform = 'scale(1.2) rotate(10deg)';
+                        setTimeout(() => {
+                            cacherTousLesEcrans();
+                            document.getElementById('etape-minijeu-2').style.display = 'block';
+                        }, 900);
+                    }
+                    isFiring = false;
+                }, 400);
+            }, 450);
+        }
+
+        function validerQG() {
+            const reponseQG = document.getElementById('reponse-qg').value.trim().toLowerCase();
+            
+            if(reponseQG === "non" || reponseQG.includes("non") || reponseQG === "jamais") {
+                lancerMiniJeuCables();
+            } else {
+                document.getElementById('erreur-qg').style.display = 'block';
+                const containerQG = document.getElementById('etape-minijeu-2');
+                containerQG.classList.add('shake-effect');
+                setTimeout(() => containerQG.classList.remove('shake-effect'), 300);
+            }
+        }
+
+        function lancerMiniJeuCables() {
+            cacherTousLesEcrans();
+            document.getElementById('etape-minijeu-cables').style.display = 'block';
+            selectedSource = null;
+            selectedSourceElement = null;
+            connectionsMade = 0;
+            document.getElementById('cable-status-log').innerText = "Branchements réussis : 0 / 3";
+            document.getElementById('erreur-cables').style.display = 'none';
+
+            document.querySelectorAll('.cable-node').forEach(node => {
+                node.classList.remove('selected', 'connected');
+                node.style.pointerEvents = 'auto';
+            });
+        }
+
+        function selectionnerSource(type, element) {
+            if (element.classList.contains('connected')) return;
+            
+            document.querySelectorAll('.source-node').forEach(n => n.classList.remove('selected'));
+            element.classList.add('selected');
+            selectedSource = type;
+            selectedSourceElement = element;
+            document.getElementById('erreur-cables').style.display = 'none';
+        }
+
+        function selectionnerCible(targetType, element) {
+            if (element.classList.contains('connected')) return;
+            
+            if (!selectedSource) {
+                document.getElementById('erreur-cables').innerText = "⚠️ Clique d'abord sur une commande à gauche !";
+                document.getElementById('erreur-cables').style.display = 'block';
+                return;
+            }
+
+            if (selectedSource === targetType) {
+                selectedSourceElement.classList.remove('selected');
+                selectedSourceElement.classList.add('connected');
+                selectedSourceElement.style.pointerEvents = 'none';
+
+                element.classList.add('connected');
+                element.style.pointerEvents = 'none';
+
+                connectionsMade++;
+                document.getElementById('cable-status-log').innerText = `Branchements réussis : ${connectionsMade} / 3`;
+                
+                selectedSource = null;
+                selectedSourceElement = null;
+
+                if (connectionsMade === totalConnections) {
+                    document.getElementById('cable-status-log').innerHTML = `<span style="color: var(--neon-green);">✅ CIRCUITS RECONFIGURÉS !</span>`;
+                    setTimeout(() => {
+                        cacherTousLesEcrans();
+                        document.getElementById('etape-mdp-hitler').style.display = 'block';
+                    }, 1200);
+                }
+            } else {
+                document.getElementById('erreur-cables').innerText = "❌ Mauvaise correspondance ! Ce câble ne va pas ici.";
+                document.getElementById('erreur-cables').style.display = 'block';
+                const containerCables = document.getElementById('etape-minijeu-cables');
+                containerCables.classList.add('shake-effect');
+                setTimeout(() => containerCables.classList.remove('shake-effect'), 300);
+
+                if (selectedSourceElement) {
+                    selectedSourceElement.classList.remove('selected');
+                }
+                selectedSource = null;
+                selectedSourceElement = null;
+            }
+        }
+
+        function validerMotDePasse() {
+            const mdp = document.getElementById('reponse-mdp').value.trim().toLowerCase();
+            
+            if (mdp === "1945" || mdp.includes("1945")) {
+                cacherTousLesEcrans();
+                document.getElementById('etape-fouille-fichiers').style.display = 'block';
+            } else {
+                document.getElementById('erreur-mdp').style.display = 'block';
+                const containerMdp = document.getElementById('etape-mdp-hitler');
+                containerMdp.classList.add('shake-effect');
+                setTimeout(() => containerMdp.classList.remove('shake-effect'), 300);
+            }
+        }
+
+        function verifierFichier(nomFichier, element) {
+            const msgBox = document.getElementById('file-message-box');
+            if (nomFichier === 'dossier_personnel_secret.cfg') {
+                msgBox.innerHTML = `<span style="color: var(--neon-green); font-weight: bold;">🎯 TROUVÉ ! Fichier personnel déchiffré : "POINT FAIBLE : Adore par-tout les BURGERS bien chauds et croustillants !"</span>`;
+                document.getElementById('btn-suite-burger').style.display = 'block';
+            } else {
+                msgBox.innerHTML = `📄 Analyse de ${nomFichier} : Données de routine, aucun secret majeur trouvé.`;
+            }
+        }
+
+        // --- GESTION DU MINI-JEU RPG AVANCÉ (CANVAS) ---
+        function lancerJeuPoursuite() {
+            cacherTousLesEcrans();
+            document.getElementById('etape-vol-burger').style.display = 'block';
+            
+            rpgCanvas = document.getElementById('rpg-canvas');
+            rpgCtx = rpgCanvas.getContext('2d');
+
+            playerX = 40;
+            playerY = 220;
+            
+            keyObj.collected = false;
+            terminalObj.hacked = false;
+            burgerObj.unlocked = false;
+
+            document.getElementById('quest-key').className = "quest-item";
+            document.getElementById('quest-key').innerText = "🔑 Clé: 0/1";
+            document.getElementById('quest-terminal').className = "quest-item";
+            document.getElementById('quest-terminal').innerText = "💻 Terminal: 0/1";
+            document.getElementById('quest-burger').className = "quest-item";
+            document.getElementById('quest-burger').innerText = "🍔 Burger: Verrouillé";
+
+            gameRunning = true;
+            
+            window.addEventListener('keydown', handleKeyDown);
+            window.addEventListener('keyup', handleKeyUp);
+
+            rpgLoop();
+        }
+
+        function handleKeyDown(e) {
+            if(['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'w', 'a', 's', 'd'].includes(e.key)) {
+                e.preventDefault();
+                keysPressed[e.key] = true;
+            }
+        }
+
+        function handleKeyUp(e) {
+            if(keysPressed[e.key]) {
+                keysPressed[e.key] = false;
+            }
+        }
+
+        function pressKey(dir) {
+            keysPressed[dir] = true;
+            setTimeout(() => {
+                keysPressed[dir] = false;
+            }, 180);
+        }
+
+        function checkWallCollision(nx, ny) {
+            for (let w of rpgWalls) {
+                if (nx + playerSize/2 > w.x && nx - playerSize/2 < w.x + w.w &&
+                    ny + playerSize/2 > w.y && ny - playerSize/2 < w.y + w.h) {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        function rpgLoop() {
+            if (!gameRunning) return;
+
+            let nextX = playerX;
+            let nextY = playerY;
+
+            if (keysPressed['ArrowUp'] || keysPressed['w'] || keysPressed['W']) nextY -= playerSpeed;
+            if (keysPressed['ArrowDown'] || keysPressed['s'] || keysPressed['S']) nextY += playerSpeed;
+            if (keysPressed['ArrowLeft'] || keysPressed['a'] || keysPressed['A']) nextX -= playerSpeed;
+            if (keysPressed['ArrowRight'] || keysPressed['d'] || keysPressed['D']) nextX += playerSpeed;
+
+            // Collision murs
+            if (!checkWallCollision(nextX, playerY)) playerX = nextX;
+            if (!checkWallCollision(playerX, nextY)) playerY = nextY;
+
+            // Mouvements des gardes
+            rpgGuards.forEach(g => {
+                if (g.vertical) {
+                    g.y += g.vy;
+                    if (g.y < g.minY || g.y > g.maxY) g.vy *= -1;
+                } else {
+                    g.x += g.vx;
+                    if (g.x < g.minX || g.x > g.maxX) g.vx *= -1;
+                }
+
+                // Collision Garde <-> Joueur
+                let dist = Math.hypot(playerX - g.x, playerY - g.y);
+                if (dist < playerSize/2 + g.radius - 4) {
+                    playerX = 40;
+                    playerY = 220;
+                    document.getElementById('rpg-status').innerHTML = `<span style="color: var(--neon-red);">🚨 Repéré par un garde ! Retour au point de départ.</span>`;
+                    setTimeout(() => {
+                        if(gameRunning) {
+                            if(!keyObj.collected) document.getElementById('rpg-status').innerText = "1️⃣ Trouve la clé d'accès (🔑) dans le labyrinthe !";
+                            else if(!terminalObj.hacked) document.getElementById('rpg-status').innerText = "2️⃣ Pirate le terminal (💻) pour déverrouiller la zone !";
+                            else document.getElementById('rpg-status').innerText = "3️⃣ Fonce vers le Burger King (🍔) !";
+                        }
+                    }, 1200);
+                }
+            });
+
+            // Ramasser la Clé
+            if (!keyObj.collected) {
+                if (Math.hypot(playerX - keyObj.x, playerY - keyObj.y) < playerSize/2 + keyObj.radius) {
+                    keyObj.collected = true;
+                    document.getElementById('quest-key').className = "quest-item completed";
+                    document.getElementById('quest-key').innerText = "🔑 Clé: 1/1 (Obtenue !)";
+                    document.getElementById('rpg-status').innerHTML = `<span style="color: var(--neon-blue);">💡 Clé récupérée ! Trouve maintenant le terminal de sécurité (💻).</span>`;
+                }
+            }
+
+            // Pirater le Terminal
+            if (keyObj.collected && !terminalObj.hacked) {
+                if (Math.hypot(playerX - terminalObj.x, playerY - terminalObj.y) < playerSize/2 + terminalObj.radius) {
+                    terminalObj.hacked = true;
+                    burgerObj.unlocked = true;
+                    document.getElementById('quest-terminal').className = "quest-item completed";
+                    document.getElementById('quest-terminal').innerText = "💻 Terminal: 1/1 (Piraté !)";
+                    document.getElementById('quest-burger').className = "quest-item completed";
+                    document.getElementById('quest-burger').innerText = "🍔 Burger: Déverrouillé !";
+                    document.getElementById('rpg-status').innerHTML = `<span style="color: var(--neon-green);">🚀 Barrières levées ! Attrape le Burger King (🍔) !</span>`;
+                }
+            }
+
+            // Attraper le Burger (Victoire du mini-jeu)
+            if (burgerObj.unlocked) {
+                if (Math.hypot(playerX - burgerObj.x, playerY - burgerObj.y) < playerSize/2 + burgerObj.radius) {
+                    gameRunning = false;
+                    window.removeEventListener('keydown', handleKeyDown);
+                    window.removeEventListener('keyup', handleKeyUp);
+                    
+                    document.getElementById('rpg-status').innerHTML = `<span style="color: var(--neon-green);">✅ Burger suprême dérobé avec brio ! Passage au QG...</span>`;
+                    setTimeout(() => {
+                        cacherTousLesEcrans();
+                        document.getElementById('etape-confrontation').style.display = 'block';
+                    }, 1200);
+                    return;
+                }
+            }
+
+            // --- RENDU GRAPHIQUE SUR CANVAS ---
+            rpgCtx.clearRect(0, 0, rpgCanvas.width, rpgCanvas.height);
+
+            // Grille de sol futuriste
+            rpgCtx.strokeStyle = "rgba(0, 210, 255, 0.05)";
+            rpgCtx.lineWidth = 1;
+            for (let i = 0; i < rpgCanvas.width; i += 30) {
+                rpgCtx.beginPath(); rpgCtx.moveTo(i, 0); rpgCtx.lineTo(i, rpgCanvas.height); rpgCtx.stroke();
+            }
+            for (let j = 0; j < rpgCanvas.height; j += 30) {
+                rpgCtx.beginPath(); rpgCtx.moveTo(0, j); rpgCtx.lineTo(rpgCanvas.width, j); rpgCtx.stroke();
+            }
+
+            // Dessiner les murs
+            rpgCtx.fillStyle = "#1e293b";
+            rpgCtx.strokeStyle = "#00d2ff";
+            rpgCtx.lineWidth = 2;
+            rpgWalls.forEach(w => {
+                rpgCtx.fillRect(w.x, w.y, w.w, w.h);
+                rpgCtx.strokeRect(w.x, w.y, w.w, w.h);
+            });
+
+            // Dessiner la Clé (si non ramassée)
+            if (!keyObj.collected) {
+                rpgCtx.font = "20px sans-serif";
+                rpgCtx.textAlign = "center";
+                rpgCtx.textBaseline = "middle";
+                rpgCtx.shadowColor = "#ffb703";
+                rpgCtx.shadowBlur = 10;
+                rpgCtx.fillText("🔑", keyObj.x, keyObj.y);
+            }
+
+            // Dessiner le Terminal (si non piraté)
+            if (!terminalObj.hacked) {
+                rpgCtx.font = "20px sans-serif";
+                rpgCtx.textAlign = "center";
+                rpgCtx.textBaseline = "middle";
+                rpgCtx.shadowColor = "#00d2ff";
+                rpgCtx.shadowBlur = 10;
+                rpgCtx.fillText("💻", terminalObj.x, terminalObj.y);
+            }
+
+            // Dessiner le Burger (pulsant / verrouillé ou déverrouillé)
+            rpgCtx.font = "24px sans-serif";
+            rpgCtx.textAlign = "center";
+            rpgCtx.textBaseline = "middle";
+            rpgCtx.shadowColor = burgerObj.unlocked ? "#10b981" : "#ef4444";
+            rpgCtx.shadowBlur = 15;
+            rpgCtx.fillText(burgerObj.unlocked ? "🍔" : "🔒", burgerObj.x, burgerObj.y);
+
+            // Dessiner les Gardes
+            rpgGuards.forEach(g => {
+                rpgCtx.shadowColor = "#ef4444";
+                rpgCtx.shadowBlur = 12;
+                rpgCtx.fillText("🚨", g.x, g.y);
+            });
+
+            // Dessiner le Joueur (Ninja 🥷)
+            rpgCtx.shadowColor = "#00d2ff";
+            rpgCtx.shadowBlur = 15;
+            rpgCtx.fillText("🥷", playerX, playerY);
+
+            rpgCtx.shadowBlur = 0; // Reset shadow
+
+            rpgAnimFrame = requestAnimationFrame(rpgLoop);
+        }
+
+        function offrirBurger() {
+            const btn = document.getElementById('btn-offrir');
+            btn.disabled = true;
+            btn.style.opacity = '0.5';
+
+            const burger = document.getElementById('moving-burger');
+            const enemy = document.getElementById('enemy-char');
+            const txt = document.getElementById('confrontation-text');
+
+            txt.innerText = "🍔 Tu tues le suspense et tends le burger fumant...";
+            burger.classList.add('glide-anim');
+
+            setTimeout(() => {
+                burger.style.display = 'none';
+                enemy.innerText = '😋';
+                enemy.classList.add('eat-anim');
+                txt.innerHTML = `<span style="color: var(--neon-green);">✨ INCROYABLE ! Il prend une énorme bouchée... Ses yeux s'illuminent de bonheur ! La guerre est instantanément annulée ! 🕊️</span>`;
+            }, 1200);
+
+            setTimeout(() => {
+                cacherTousLesEcrans();
+                document.getElementById('gagnant-pseudo').innerText = joueur.pseudo;
+                document.getElementById('final').style.display = 'block';
+            }, 3200);
+        }
+    </script>
+</body>
+</html>
