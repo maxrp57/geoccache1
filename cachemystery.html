@@ -621,9 +621,7 @@
     <!-- ÉCRAN 1 : ACCUEIL -->
     <div class="container" id="accueil">
         <h2>🧭 Chrono-Cache</h2>
-        <p>Entrez votre pseudo de géocacheur et sélectionnez votre bande-son pour tester la machine temporelle :</p>
-        
-        <input type="text" id="pseudo" placeholder="Votre Pseudo" required>
+        <p>Sélectionnez votre bande-son pour tester la machine temporelle :</p>
         
         <div class="music-selector-container">
             <label class="music-card selected" id="card-rap" onclick="choisirMusique('rap')">
@@ -637,7 +635,6 @@
         </div>
 
         <button onclick="commencerAventure()">Essayer la Machine</button>
-        <div id="erreur-accueil" style="color: var(--neon-red); margin-top: 12px; display: none; font-weight: bold; font-size: 14px;">Veuillez entrer un pseudo valide.</div>
     </div>
 
     <!-- ÉCRAN 2 : SYNCHRO TEMPORELLE (PORTAIL) -->
@@ -912,10 +909,10 @@
         <!-- ZONE DES COORDONNÉES FINALES ULTRA CLAIRE -->
         <div class="gps-coords" style="border-color: var(--neon-gold); color: var(--neon-gold); font-size: 15px; padding: 18px; background: rgba(255, 183, 3, 0.12); box-shadow: 0 0 20px rgba(255, 183, 3, 0.25);">
             🎯 COORDONNÉES FINALES DE LA GÉOCACHE :<br>
-            <span style="font-size: 19px; color: #ffffff; font-family: monospace; font-weight: 800; text-shadow: 0 0 10px rgba(255,183,3,0.8);">je finirais ceci j'attend votre premier retour , Mr le reviewer merci :)</span>
+            <span style="font-size: 19px; color: #ffffff; font-family: monospace; font-weight: 800; text-shadow: 0 0 10px rgba(255,183,3,0.8);">47°19'52.1"N 7°15'06.9"E</span>
         </div>
 
-        <a href="http://googleusercontent.com/maps.google.com/2" target="_blank" style="text-decoration: none;">
+        <a href="https://maps.google.com/?q=47.331139,7.251917" target="_blank" style="text-decoration: none;">
             <button style="background: rgba(0, 210, 255, 0.2); border: 1px solid var(--neon-blue); margin-top: 5px; margin-bottom: 5px;">🗺️ Ouvrir les coordonnées finales dans Maps</button>
         </a>
 
@@ -935,7 +932,7 @@
 
     <script>
         let joueur = {
-            pseudo: "",
+            pseudo: "geocacheur",
             musique: "rap"
         };
 
@@ -1003,16 +1000,7 @@
         }
 
         function commencerAventure() {
-            let pseudoSaisi = document.getElementById("pseudo").value.trim();
-
-            if(pseudoSaisi === "") {
-                document.getElementById("erreur-accueil").style.display = "block";
-                document.getElementById("accueil").classList.add('shake-effect');
-                setTimeout(() => document.getElementById("accueil").classList.remove('shake-effect'), 300);
-                return;
-            }
-
-            joueur.pseudo = pseudoSaisi;
+            joueur.pseudo = "geocacheur";
 
             let fichierAudio = (joueur.musique === "rap") ? "rap.mp3" : "michael.mp3";
             currentAudio = new Audio(fichierAudio);
